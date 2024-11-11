@@ -1,79 +1,42 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import toast, { Toaster } from 'react-hot-toast';
+import { useAuth } from '../../Store/AuthStore';
+import toast from 'react-hot-toast';
 
 const Signup = () => {
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        mobile: '',
-        password: '',
-        image: null,
-    });
-    const [loading, setLoading] = useState(false); // Loading state
-
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const { signup, error } = useAuth();
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setFormData({ ...formData, image: reader.result });
-        };
-        reader.readAsDataURL(file);
-    };
-
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const handleSubmit = async (e) => {
+    const handleSignup = async (e) => {
         e.preventDefault();
-        setLoading(true); // Start loading
-        // console.log("Form Data:", formData);
-        // Client-side validation
-        if (!formData.name || !formData.email || !formData.mobile || !formData.password) {
-            toast.error("All fields are required");
-            setLoading(false); // Stop loading on validation error
-            return;
-        }
+        setLoading(true);
 
-        const response = await fetch('http://localhost:5000/signup', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData),
-        });
-
-        const result = await response.json();
-        // console.log("Response:", result);
-
-        setLoading(false); // Stop loading
-
-        if (response.ok) {
-            localStorage.setItem('token', result.token);
-            localStorage.setItem('user', JSON.stringify(result.user));
-            navigate('/messages');
-        } else {
-            toast.error(result.error);
+        const formData = new FormData(e.target); // Capture form data as FormData
+        try {
+            await signup(formData);
+            toast.success("Signed up successfully!");
+            navigate('/'); // Navigate to home or other route on success
+        } catch (error) {
+            toast.error(error.message || "Signup failed!");
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className='h-[600px] flex justify-center items-center'>
-            <Toaster />
             <div className='w-96 p-7'>
                 <h2 className='text-xl text-center'>Sign Up</h2>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSignup}>
                     <div className="form-control w-full max-w-xs">
                         <label className="label">Name</label>
                         <input
                             type="text"
                             name="name"
-                            onChange={handleChange}
                             className="input input-bordered w-full max-w-xs"
-                            disabled={loading} // Disable input while loading
+                            disabled={loading}
+                            required
                         />
                     </div>
                     <div className="form-control w-full max-w-xs">
@@ -81,9 +44,9 @@ const Signup = () => {
                         <input
                             type="email"
                             name="email"
-                            onChange={handleChange}
                             className="input input-bordered w-full max-w-xs"
-                            disabled={loading} // Disable input while loading
+                            disabled={loading}
+                            required
                         />
                     </div>
                     <div className="form-control w-full max-w-xs">
@@ -91,9 +54,9 @@ const Signup = () => {
                         <input
                             type="text"
                             name="mobile"
-                            onChange={handleChange}
                             className="input input-bordered w-full max-w-xs"
-                            disabled={loading} // Disable input while loading
+                            disabled={loading}
+                            required
                         />
                     </div>
                     <div className="form-control w-full max-w-xs">
@@ -101,29 +64,30 @@ const Signup = () => {
                         <input
                             type="password"
                             name="password"
-                            onChange={handleChange}
                             className="input input-bordered w-full max-w-xs"
-                            disabled={loading} // Disable input while loading
+                            disabled={loading}
+                            required
                         />
                     </div>
                     <div className="form-control w-full max-w-xs">
                         <label className="label">Profile Picture</label>
                         <input
                             type="file"
+                            name="profilePicture"
                             accept="image/*"
-                            onChange={handleImageChange}
                             className="input input-bordered w-full max-w-xs"
-                            disabled={loading} // Disable input while loading
+                            disabled={loading}
                         />
                     </div>
                     <button
                         className='btn btn-accent w-full mt-4'
                         type="submit"
-                        disabled={loading} // Disable button while loading
+                        disabled={loading}
                     >
-                        {loading ? 'Signing Up...' : 'Sign Up'} {/* Show loading text */}
+                        {loading ? 'Signing Up...' : 'Sign Up'}
                     </button>
                 </form>
+                {error && <p className="text-red-500">{error}</p>}
                 <p>Already have an account? <Link className='text-secondary' to="/login">Please Login</Link></p>
             </div>
         </div>

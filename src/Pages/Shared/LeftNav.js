@@ -5,10 +5,12 @@ import { TbExchange } from 'react-icons/tb';
 import { IoMdPerson } from 'react-icons/io';
 import { RiMessageLine } from 'react-icons/ri';
 import { CiSettings, CiPower } from 'react-icons/ci';
+const { useAuth } = require("../../Store/AuthStore")
 
 const LeftNav = ({ onChangeTheme }) => { // Accept onChangeTheme prop here
     const [isOpen, setIsOpen] = useState(false);
     const drawerRef = useRef(null);
+    const { logout } = useAuth();
     const navigate = useNavigate();
 
     const toggleDrawer = () => {
@@ -32,21 +34,12 @@ const LeftNav = ({ onChangeTheme }) => { // Accept onChangeTheme prop here
 
     const handleLogout = async () => {
         try {
-            await fetch('http://localhost:5000/logout', {  // Adjust the URL to match your backend server's URL
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            await logout();
             navigate('/login');
         } catch (error) {
             console.error('Logout error:', error);
         }
     };
-
 
     return (
         <div className="relative">

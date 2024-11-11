@@ -1,5 +1,4 @@
 import React from 'react';
-import convertBufferToBase64 from '../../Utils/convertBufferToBase64';
 
 const UserListModal = ({ users, onUserClick }) => {
     return (
@@ -15,11 +14,7 @@ const UserListModal = ({ users, onUserClick }) => {
                         >
                             <div className="avatar mr-4">
                                 <div className="w-12 h-12 rounded-full">
-                                    {u.profilePicture && u.profilePicture.data ? (
-                                        <img src={`data:${u.profilePicture.contentType};base64,${convertBufferToBase64(u.profilePicture.data)}`} alt={`${u.name} Avatar`} />
-                                    ) : (
-                                        <img src="/default-avatar.png" alt="Default Avatar" />
-                                    )}
+                                    <img src="/default-avatar.png" alt="Default Avatar" />
                                 </div>
                             </div>
                             <div>

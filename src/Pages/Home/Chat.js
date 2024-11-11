@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaPhoneAlt, FaVideo, FaEllipsisV, FaSmile, FaPaperclip, FaPaperPlane, FaArrowLeft } from 'react-icons/fa';
 import { SlOptionsVertical } from "react-icons/sl";
-import convertBufferToBase64 from '../../Utils/convertBufferToBase64';
 import EmojiPicker from 'emoji-picker-react';
 
 const Chat = ({ selectedUser, setShowChatOnMobile }) => {
@@ -206,14 +205,8 @@ const Chat = ({ selectedUser, setShowChatOnMobile }) => {
             </button>
             <div className="flex items-center">
               <img
-                src={
-                  selectedUser.profilePicture?.data
-                    ? `data:${selectedUser.profilePicture.contentType};base64,${convertBufferToBase64(
-                      selectedUser.profilePicture.data
-                    )}`
-                    : '/default-avatar.png'
-                }
-                alt={`${selectedUser.name} profile`}
+                src='/default-avatar.png'
+                alt="profile"
                 className="w-10 h-10 rounded-full mr-4"
               />
               <div>

@@ -1,10 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import moment from 'moment';
-import convertBufferToBase64 from '../../Utils/convertBufferToBase64';
 import { BsPersonAdd } from "react-icons/bs";
 import { AiOutlineUsergroupAdd } from "react-icons/ai";
 import { LuListFilter } from "react-icons/lu";
-import { fetchUsers } from '../../Services/userService';
 import { toast } from 'react-hot-toast';
 import UserListModal from '../../Components/Modals/UserListModal';
 import CreateGroupModal from '../../Components/Modals/CreateGroupModal';
@@ -21,6 +19,8 @@ const Users = ({ selectedUser, setSelectedUser }) => {
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
 
     const loggedInUserId = JSON.parse(localStorage.getItem('user'))?._id;
+    console.log(loggedInUserId);
+    console.log(filteredUsers);
 
     // Toggle Filter Modal
     const toggleFilterModal = () => {
@@ -32,9 +32,9 @@ const Users = ({ selectedUser, setSelectedUser }) => {
         const preFetchUsers = async () => {
             try {
                 setIsLoading(true);
-                const token = localStorage.getItem('token');
-                const userList = await fetchUsers(token);
-                setUsers(userList);
+                // const token = localStorage.getItem('token');
+                // const userList = await ;
+                // setUsers(userList);
             } catch (error) {
                 console.error("Error pre-fetching users:", error);
             } finally {
@@ -208,15 +208,7 @@ const Users = ({ selectedUser, setSelectedUser }) => {
                             className={`flex items-center space-x-4 p-2 cursor-pointer hover:bg-gray-700 rounded-md ${selectedUser?._id === user._id ? 'lg:bg-gray-700' : ''}`}
                             onClick={() => setSelectedUser(user)}
                         >
-                            <img
-                                src={
-                                    user.profilePicture?.data
-                                        ? `data:${user.profilePicture.contentType};base64,${convertBufferToBase64(user.profilePicture.data)}`
-                                        : '/default-avatar.png' // Fallback to default avatar if there's no profile picture
-                                }
-                                alt={`${user.name}'s avatar`}
-                                className="w-14 h-16 rounded-badge"
-                            />
+                            <img src="" alt=".." className="w-14 h-16 rounded-badge" />
 
                             <div className="flex-1">
                                 <p className="font-semibold text-green-500 my-1">{user.name}</p>

@@ -1,5 +1,5 @@
 import React from 'react';
-import Loader from '../Shared/Loader';
+import Loader from '../../Components/Loader';
 
 const Setting = () => {
     return (

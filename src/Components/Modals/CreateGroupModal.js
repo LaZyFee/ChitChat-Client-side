@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { FcAddImage } from "react-icons/fc";
-import convertBufferToBase64 from '../../Utils/convertBufferToBase64';
 import { toast } from 'react-hot-toast';
 
 const CreateGroupModal = ({ users, onClose }) => {
@@ -78,11 +77,8 @@ const CreateGroupModal = ({ users, onClose }) => {
                             className="flex items-center space-x-4 p-2 cursor-pointer hover:bg-gray-700"
                         >
                             <img
-                                src={
-                                    user.profilePicture?.data
-                                        ? `data:${user.profilePicture.contentType};base64,${convertBufferToBase64(user.profilePicture.data)}`
-                                        : '/default-avatar.png'
-                                }
+                                src='/default-avatar.png'
+
                                 alt="avatar"
                                 className="w-14 h-16 rounded-badge"
                             />

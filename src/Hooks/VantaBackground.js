@@ -41,7 +41,6 @@ const VantaBackground = ({ effect }) => {
           minHeight: 200.00,
           minWidth: 200.00,
           scale: 1.00,
-          texturePath: './gallery/noise.png', // Adjust texture path if needed
           THREE,
           backgroundColor: 0x00000000, // Transparent background
         });
@@ -74,7 +73,7 @@ const VantaBackground = ({ effect }) => {
         left: 0,
         width: '100%',
         height: '100%',
-        zIndex: -1, // Ensure the gradient stays behind the Vanta effect
+        zIndex: -1, // gradient stays behind the Vanta effect
       }}
     >
       <div
@@ -85,8 +84,8 @@ const VantaBackground = ({ effect }) => {
           left: 0,
           width: '100%',
           height: '100%',
-          zIndex: -1, // Vanta effect in front of the gradient
-          overflow: 'hidden', // Ensure no overflow
+          // zIndex: -1, 
+          // overflow: 'hidden',
         }}
       />
     </div>
