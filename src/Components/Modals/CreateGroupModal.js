@@ -77,7 +77,7 @@ const CreateGroupModal = ({ users, onClose }) => {
                             className="flex items-center space-x-4 p-2 cursor-pointer hover:bg-gray-700"
                         >
                             <img
-                                src='/default-avatar.png'
+                                src={`${process.env.REACT_APP_BACKEND_URL}/${user.profilePicture}`}
 
                                 alt="avatar"
                                 className="w-14 h-16 rounded-badge"

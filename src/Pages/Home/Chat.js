@@ -205,7 +205,7 @@ const Chat = ({ selectedUser, setShowChatOnMobile }) => {
             </button>
             <div className="flex items-center">
               <img
-                src='/default-avatar.png'
+                src={`${process.env.REACT_APP_BACKEND_URL}/${selectedUser.profilePicture}`}
                 alt="profile"
                 className="w-10 h-10 rounded-full mr-4"
               />

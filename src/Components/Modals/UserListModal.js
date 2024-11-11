@@ -14,7 +14,7 @@ const UserListModal = ({ users, onUserClick }) => {
                         >
                             <div className="avatar mr-4">
                                 <div className="w-12 h-12 rounded-full">
-                                    <img src="/default-avatar.png" alt="Default Avatar" />
+                                    <img src={`${process.env.REACT_APP_BACKEND_URL}/${u.profilePicture}`} alt="Default Avatar" />
                                 </div>
                             </div>
                             <div>
