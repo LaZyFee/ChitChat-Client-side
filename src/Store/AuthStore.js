@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import axios from 'axios';
 
 axios.defaults.withCredentials = true;
-console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
 
 const useAuth = create((set) => ({
     user: JSON.parse(localStorage.getItem("user")) || null,

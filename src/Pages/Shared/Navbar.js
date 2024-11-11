@@ -1,8 +1,9 @@
 import React from 'react';
 import LeftNav from '../../Pages/Shared/LeftNav';
+import { useAuth } from '../../Store/AuthStore';
 
 const Navbar = ({ onChangeTheme }) => {
-    const user = JSON.parse(localStorage.getItem('user'));
+    const { user } = useAuth();
 
     return (
         <div className="navbar px-4 py-2 shadow-sm flex items-center justify-between">
@@ -13,20 +14,33 @@ const Navbar = ({ onChangeTheme }) => {
 
             {user && (
                 <div className="flex items-center space-x-4 text-white">
+                    {/* Desktop Profile Info */}
                     <div className="hidden md:block">
                         <p className="font-semibold">{user.name}</p>
                         <p className="text-sm text-green-400">Online</p>
                     </div>
+
+                    {/* Desktop Profile Picture */}
                     <div className="w-14 h-14 rounded-full ring ring-white ring-offset-base-100 ring-offset-2 overflow-hidden hidden md:block">
-                        <img src={user.profilePicture} alt="User Avatar" className="w-full h-full object-cover" />
+                        <img
+                            src={`${process.env.REACT_APP_BACKEND_URL}/${user.profilePicture}`}
+                            alt="User Avatar"
+                            className="w-full h-full object-cover"
+                        />
                     </div>
+
+                    {/* Mobile Profile Info and Picture */}
                     <div className="md:hidden dropdown dropdown-end">
                         <div
                             tabIndex={0}
                             role="button"
                             className="btn btn-ghost btn-circle avatar w-14 h-14 rounded-full overflow-hidden"
                         >
-                            <img src={user.profilePicture} alt="User Avatar" className="w-full h-full object-cover" />
+                            <img
+                                src={`${process.env.REACT_APP_BACKEND_URL}/${user.profilePicture}`}
+                                alt="User Avatar"
+                                className="w-full h-full object-cover"
+                            />
                         </div>
                         <ul
                             tabIndex={0}

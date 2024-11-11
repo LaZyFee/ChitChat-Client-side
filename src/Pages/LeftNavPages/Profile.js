@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import axios from 'axios'; // Use Axios for making HTTP requests
 import { toast } from 'react-hot-toast'; // Importing react-hot-toast
+import { useAuth } from '../../Store/AuthStore';
 
 const Profile = () => {
-    const user = JSON.parse(localStorage.getItem('user'));
+    const { user } = useAuth();
+    console.log(user);
     const [profilePicture, setProfilePicture] = useState(user.profilePicture);
     const [name, setName] = useState(user.name); // Track name change
     const [showMenu, setShowMenu] = useState(false);
@@ -94,7 +96,7 @@ const Profile = () => {
                             onMouseLeave={() => setHover(false)}
                         >
                             <img
-                                src={profilePicture || 'default-avatar-url'}
+                                src={`${process.env.REACT_APP_BACKEND_URL}/${user.profilePicture}`}
                                 alt="Profile"
                                 className="rounded-full w-40 h-40 object-cover mb-4"
                             />
@@ -208,7 +210,7 @@ const Profile = () => {
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-75">
                     <div className="relative">
                         <img
-                            src={profilePicture || 'default-avatar-url'}
+                            src={`${process.env.REACT_APP_BACKEND_URL}/${user.profilePicture}`}
                             alt="Profile"
                             className="rounded-lg max-w-md w-full"
                         />
