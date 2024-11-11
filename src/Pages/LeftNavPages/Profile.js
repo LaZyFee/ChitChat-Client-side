@@ -1,85 +1,140 @@
-import React, { useState } from 'react';
-import axios from 'axios'; // Use Axios for making HTTP requests
-import { toast } from 'react-hot-toast'; // Importing react-hot-toast
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 import { useAuth } from '../../Store/AuthStore';
 
 const Profile = () => {
-    const { user } = useAuth();
-    console.log(user);
-    const [profilePicture, setProfilePicture] = useState(user.profilePicture);
-    const [name, setName] = useState(user.name); // Track name change
+    const { user, setUser } = useAuth();
+    const [imagePreview, setImagePreview] = useState(null);
+    const [profilePicture, setProfilePicture] = useState(null);
     const [showMenu, setShowMenu] = useState(false);
     const [hover, setHover] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
-
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
+    const [name, setName] = useState(user.name);
 
-    // Function to handle profile picture changes
-    const handleProfilePictureChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                setProfilePicture(e.target.result);
-            };
-            reader.readAsDataURL(file);
+    // Close modal when clicking outside of it
+    const handleOutsideClick = (e) => {
+        if (e.target.id === 'modalOverlay') {
+            setShowModal(false);
         }
-        setShowMenu(false); // Close the menu
     };
 
-    // Function to handle profile updates
-    const handleSubmit = async (e) => {
-        e.preventDefault(); // Prevent page reload
+    useEffect(() => {
+        if (showModal) {
+            // Add event listener when modal is open
+            document.addEventListener('click', handleOutsideClick);
+
+            return () => {
+                // Cleanup the event listener when the modal is closed
+                document.removeEventListener('click', handleOutsideClick);
+            };
+        }
+    }, [showModal]);
+
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!currentPassword) {
+            toast.error('Please enter your current password to make changes.');
+            return;
+        }
+
+        const hasNameChanged = name !== user.name;
+        const hasNewPassword = newPassword.length > 0;
+        const hasProfilePictureChanged = profilePicture !== null;
+
+        if (!hasNameChanged && !hasNewPassword && !hasProfilePictureChanged) {
+            toast.error('No changes detected.');
+            return;
+        }
+
         setIsSubmitting(true);
 
         try {
             const formData = new FormData();
-            formData.append('name', name);
-            if (profilePicture) {
-                formData.append('profile_pic', document.getElementById('fileInput').files[0]); // Append the file to FormData
-            }
-            formData.append('currentPassword', currentPassword); // Add current password
-            formData.append('newPassword', newPassword); // Add new password
+            formData.append('currentPassword', currentPassword);
 
-            // Send a request to update the user
-            const response = await axios.put('http://localhost:5000/update-user', formData, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
-                    'Content-Type': 'multipart/form-data' // Make sure it's a multipart form request
-                },
-            });
+            if (hasNameChanged) {
+                formData.append('name', name);
+            }
+
+            if (hasNewPassword) {
+                formData.append('newPassword', newPassword);
+            }
+
+            if (hasProfilePictureChanged) {
+                formData.append('profilePicture', profilePicture);
+            }
+
+            const response = await axios.put(
+                `${process.env.REACT_APP_BACKEND_URL}/api/auth/update-user/${user._id}`,
+                formData,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
 
             if (response.status === 200) {
-                // Show success toast
                 toast.success('Profile updated successfully!');
-
-                // Update the local storage if necessary
-                localStorage.setItem('user', JSON.stringify({ ...user, name, profilePicture }));
-
-                // Close modal and refresh page after success
-                setShowModal(false);
-                window.location.reload(); // Refresh the page to show the updated profile picture
+                const updatedUser = { ...user, name, profilePicture: response.data.user.profilePicture };
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+                setUser(updatedUser);
+                setCurrentPassword('');
+                setNewPassword('');
+                setProfilePicture(null);
             }
         } catch (error) {
             console.error('Error updating profile:', error);
-            // Show error toast
             toast.error('There was an error updating your profile.');
         } finally {
             setIsSubmitting(false);
         }
     };
 
-
     const handleViewImage = () => {
         setShowModal(true);
-        setShowMenu(false); // Close the menu after selecting
+        setShowMenu(false);
     };
 
-    const handleRemoveImage = () => {
-        setProfilePicture(null);
-        setShowMenu(false); // Close the menu after selecting
+    const handleRemoveImage = async () => {
+        try {
+            // Send request to remove image
+            const response = await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/auth/update-user/${user._id}`,
+                { removeImage: true },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                }
+            );
+
+            // Confirm response and then update frontend state
+            if (response.status === 200) {
+                // Update state and Zustand
+                setProfilePicture(null);
+                setImagePreview(null);
+                setUser({ ...user, profilePicture: null });
+                toast.success('Profile picture removed.');
+            } else {
+                toast.error('Error removing profile picture.');
+            }
+        } catch (error) {
+            toast.error('Error removing profile picture.');
+        }
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        setProfilePicture(file);
+        if (file) {
+            setImagePreview(URL.createObjectURL(file));
+        }
     };
 
     return (
@@ -89,14 +144,14 @@ const Profile = () => {
                     <h1 className="text-5xl font-bold whitespace-nowrap">Update Profile</h1>
                 </div>
                 <div className="card w-full max-w-sm shrink-0 shadow-2xl">
-                    <form className="card-body" onSubmit={handleSubmit}>
+                    <form className="card-body" onSubmit={handleFormSubmit}>
                         <div
                             className="relative form-control flex flex-col items-center"
                             onMouseEnter={() => setHover(true)}
                             onMouseLeave={() => setHover(false)}
                         >
                             <img
-                                src={`${process.env.REACT_APP_BACKEND_URL}/${user.profilePicture}`}
+                                src={imagePreview || `${process.env.REACT_APP_BACKEND_URL}/${user.profilePicture}`}
                                 alt="Profile"
                                 className="rounded-full w-40 h-40 object-cover mb-4"
                             />
@@ -126,7 +181,7 @@ const Profile = () => {
                             <input
                                 type="file"
                                 accept="image/*"
-                                onChange={handleProfilePictureChange}
+                                onChange={handleFileChange}
                                 id="fileInput"
                                 style={{ display: 'none' }}
                             />
@@ -139,7 +194,7 @@ const Profile = () => {
                             <input
                                 type="text"
                                 value={name}
-                                onChange={(e) => setName(e.target.value)} // Capture name change
+                                onChange={(e) => setName(e.target.value)}
                                 className="input input-bordered"
                                 required
                             />
@@ -169,7 +224,6 @@ const Profile = () => {
                             />
                         </div>
 
-                        {/* Add current password input */}
                         <div className="form-control">
                             <label className="label">
                                 <span className="label-text">Current Password</span>
@@ -183,7 +237,6 @@ const Profile = () => {
                             />
                         </div>
 
-                        {/* Add new password input */}
                         <div className="form-control">
                             <label className="label">
                                 <span className="label-text">New Password</span>
@@ -193,7 +246,6 @@ const Profile = () => {
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
                                 className="input input-bordered"
-                                required
                             />
                         </div>
 
@@ -207,10 +259,10 @@ const Profile = () => {
             </div>
 
             {showModal && (
-                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-75">
+                <div id="modalOverlay" className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-75">
                     <div className="relative">
                         <img
-                            src={`${process.env.REACT_APP_BACKEND_URL}/${user.profilePicture}`}
+                            src={imagePreview || `${process.env.REACT_APP_BACKEND_URL}/${user.profilePicture}`}
                             alt="Profile"
                             className="rounded-lg max-w-md w-full"
                         />
