@@ -38,7 +38,7 @@ const Chat = ({ selectedUser, setShowChatOnMobile }) => {
 
   const handleSendMessage = () => {
     if (message.trim() && selectedUser?._id) {
-      sendMessage(selectedUser._id, message, user._id);
+      sendMessage(selectedUser._id, user._id, message,);
       setMessage('');
       inputRef.current.innerText = '';
       scrollToBottom();
