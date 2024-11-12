@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { useState, useEffect, useRef } from 'react';
 import { FaPhoneAlt, FaVideo, FaEllipsisV, FaSmile, FaPaperclip, FaPaperPlane, FaArrowLeft } from 'react-icons/fa';
 import { SlOptionsVertical } from "react-icons/sl";
@@ -15,6 +16,7 @@ const Chat = ({ selectedUser, setShowChatOnMobile }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showAttachmentOptions, setShowAttachmentOptions] = useState(false);
+  const [currentChatId, setCurrentChatId] = useState(null);
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -36,14 +38,44 @@ const Chat = ({ selectedUser, setShowChatOnMobile }) => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = () => {
+
+  const handleSendMessage = async () => {
     if (message.trim() && selectedUser?._id) {
-      sendMessage(selectedUser._id, user._id, message,);
-      setMessage('');
-      inputRef.current.innerText = '';
-      scrollToBottom();
+      try {
+        let chatIdToUse = currentChatId;
+
+        // Retrieve chat ID if it's not already set
+        if (!currentChatId) {
+          const token = localStorage.getItem('token');
+          const chatResponse = await axios.post(
+            `${process.env.REACT_APP_BACKEND_URL}/api/chat/getOrCreateChat`,
+            { senderId: user._id, receiverId: selectedUser._id },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+
+          // Ensure we have a valid chat ID from the response
+          chatIdToUse = chatResponse.data.chatId;
+          if (!chatIdToUse) {
+            console.error("Failed to retrieve or create chat ID");
+            return;
+          }
+
+          setCurrentChatId(chatIdToUse); // Set chat ID for future messages
+        }
+
+        // Send the message with the retrieved chat ID
+        await sendMessage(user._id, selectedUser._id, message, chatIdToUse);
+
+        setMessage(''); // Clear the message input
+        inputRef.current.innerText = '';
+        scrollToBottom(); // Scroll the chat window to the bottom
+      } catch (error) {
+        console.error("Error in handleSendMessage:", error);
+      }
     }
   };
+
+
 
 
 

@@ -17,18 +17,9 @@ const MessageStore = create((set) => ({
         }
     },
     sendMessage: async (senderId, receiverId, content, chatId) => {
+        console.log("sendeId: ", senderId, "receiverId: ", receiverId, "Content: ", content, "chatId: ", chatId);
         try {
             const token = localStorage.getItem('token');
-
-            // Check if chatId is provided; if not, get or create it
-            if (!chatId) {
-                const chatResponse = await axios.post(
-                    `${process.env.REACT_APP_BACKEND_URL}/api/chat/getOrCreateChat`,
-                    { senderId, receiverId },
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
-                chatId = chatResponse.data.chatId;
-            }
 
             // Send the message with the chatId (whether new or existing)
             const messageResponse = await axios.post(
