@@ -3,6 +3,7 @@ import axios from 'axios';
 
 const MessageStore = create((set) => ({
     messages: [],
+    allMessagaes: [],
     fetchMessages: async (chatId) => {
         try {
             const token = localStorage.getItem('token');
@@ -16,6 +17,22 @@ const MessageStore = create((set) => ({
             console.error("Error fetching messages:", error);
         }
     },
+    fetchAllMessages: async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/message/all`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            set({ allMessages: response.data });
+            console.log("Fetched all messages:", response.data); // Log messages here
+        } catch (error) {
+            console.error("Error fetching messages:", error);
+        }
+    },
+
+
     sendMessage: async (senderId, receiverId, content, chatId) => {
         console.log("sendeId: ", senderId, "receiverId: ", receiverId, "Content: ", content, "chatId: ", chatId);
         try {
@@ -34,7 +51,7 @@ const MessageStore = create((set) => ({
         }
     },
 
-    clearMessages: () => set({ messages: [] }),
+    // clearMessages: () => set({ messages: [] }),
 }));
 
 export default MessageStore;

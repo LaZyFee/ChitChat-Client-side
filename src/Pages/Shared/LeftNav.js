@@ -6,8 +6,10 @@ import { IoMdPerson } from 'react-icons/io';
 import { RiMessageLine } from 'react-icons/ri';
 import { CiSettings, CiPower } from 'react-icons/ci';
 const { useAuth } = require("../../Store/AuthStore")
+const { useThemeStore } = require("../../Store/ThemeStore")
 
-const LeftNav = ({ onChangeTheme }) => { // Accept onChangeTheme prop here
+const LeftNav = () => {
+    const changeEffect = useThemeStore((state) => state.changeEffect);
     const [isOpen, setIsOpen] = useState(false);
     const drawerRef = useRef(null);
     const { logout } = useAuth();
@@ -64,7 +66,7 @@ const LeftNav = ({ onChangeTheme }) => { // Accept onChangeTheme prop here
                     <div>
                         <ul className="menu p-4">
                             <li>
-                                <button className="text-2xl m-3" onClick={onChangeTheme}> {/* Call onChangeTheme here */}
+                                <button className="text-2xl m-3" onClick={changeEffect}>
                                     <TbExchange /> <p className="text-sm">Change Theme</p>
                                 </button>
                             </li>

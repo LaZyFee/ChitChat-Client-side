@@ -2,13 +2,13 @@ import React from 'react';
 import LeftNav from '../../Pages/Shared/LeftNav';
 import { useAuth } from '../../Store/AuthStore';
 
-const Navbar = ({ onChangeTheme }) => {
+const Navbar = () => {
     const { user } = useAuth();
 
     return (
         <div className="navbar px-4 py-2 shadow-sm flex items-center justify-between">
             <div className="flex items-center space-x-6">
-                <LeftNav onChangeTheme={onChangeTheme} />
+                <LeftNav />
                 <h1 className="text-3xl font-bold">ChitChat</h1>
             </div>
 
