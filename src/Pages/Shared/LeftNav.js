@@ -5,8 +5,8 @@ import { TbExchange } from 'react-icons/tb';
 import { IoMdPerson } from 'react-icons/io';
 import { RiMessageLine } from 'react-icons/ri';
 import { CiSettings, CiPower } from 'react-icons/ci';
-const { useAuth } = require("../../Store/AuthStore")
-const { useThemeStore } = require("../../Store/ThemeStore")
+const { useAuth } = require("../../Store/AuthStore");
+const { useThemeStore } = require("../../Store/ThemeStore");
 
 const LeftNav = () => {
     const changeEffect = useThemeStore((state) => state.changeEffect);

@@ -20,20 +20,21 @@ const VANTA_EFFECTS = {
 
 const VantaBackground = ({ effect }) => {
   const vantaRef = useRef(null);
+  const vantaEffectInstance = useRef(null);
 
   useEffect(() => {
-    let vantaEffect;
+    const effectFunction = VANTA_EFFECTS[effect];
+    if (!effectFunction) return;
 
     const initEffect = () => {
-      if (vantaEffect) {
-        vantaEffect.destroy();
+      // Cleanup the previous effect if it exists
+      if (vantaEffectInstance.current && typeof vantaEffectInstance.current.destroy === 'function') {
+        vantaEffectInstance.current.destroy();
       }
 
-      const effectFunction = VANTA_EFFECTS[effect];
-      if (!effectFunction) return;
-
       try {
-        vantaEffect = effectFunction({
+        // Initialize the new effect
+        vantaEffectInstance.current = effectFunction({
           el: vantaRef.current,
           mouseControls: true,
           touchControls: true,
@@ -42,7 +43,7 @@ const VantaBackground = ({ effect }) => {
           minWidth: 200.00,
           scale: 1.00,
           THREE,
-          backgroundColor: 0x00000000, // Transparent background
+          backgroundColor: 0x00000000,
         });
       } catch (error) {
         console.error('Vanta.js initialization error:', error);
@@ -52,18 +53,21 @@ const VantaBackground = ({ effect }) => {
     initEffect();
 
     const handleResize = () => {
-      if (vantaEffect) {
-        vantaEffect.resize();
+      if (vantaEffectInstance.current) {
+        vantaEffectInstance.current.resize();
       }
     };
 
     window.addEventListener('resize', handleResize);
 
     return () => {
-      if (vantaEffect) vantaEffect.destroy();
+      // Cleanup on component unmount
+      if (vantaEffectInstance.current && typeof vantaEffectInstance.current.destroy === 'function') {
+        vantaEffectInstance.current.destroy();
+      }
       window.removeEventListener('resize', handleResize);
     };
-  }, [effect]); // Only depend on 'effect' for re-initializing
+  }, [effect]); // Re-run effect when `effect` changes
 
   return (
     <div
@@ -73,7 +77,7 @@ const VantaBackground = ({ effect }) => {
         left: 0,
         width: '100%',
         height: '100%',
-        zIndex: -1, // gradient stays behind the Vanta effect
+        zIndex: -1,
       }}
     >
       <div
@@ -84,8 +88,6 @@ const VantaBackground = ({ effect }) => {
           left: 0,
           width: '100%',
           height: '100%',
-          // zIndex: -1, 
-          // overflow: 'hidden',
         }}
       />
     </div>

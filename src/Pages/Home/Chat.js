@@ -12,25 +12,6 @@ const Chat = ({ selectedUser, setShowChatOnMobile }) => {
   const fetchMessages = MessageStore((state) => state.fetchMessages);
   const sendMessage = MessageStore((state) => state.sendMessage);
 
-  const { fetchAllMessages, allMessages } = MessageStore();
-
-  useEffect(() => {
-    // Fetch messages when component mounts
-    fetchAllMessages();
-  }, [fetchAllMessages]);
-
-  useEffect(() => {
-    // Log the messages when allMessages state updates
-    console.log("All messages:", allMessages);
-  }, [allMessages]);
-
-
-
-
-
-
-
-
 
   const [message, setMessage] = useState('');
   const [isFocused, setIsFocused] = useState(false);
